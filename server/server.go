@@ -5,18 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/OlivierArgentieri/go_killprocess/middlewares"
 	"github.com/gorilla/mux"
 )
 
 type Server struct {
 	Router *mux.Router
-}
-
-func (server *Server) initRoutes() {
-	// route
-	server.Router.HandleFunc("/kill/{pid}", middlewares.SetMiddlewareJSON(server.KillProcess)).Methods("POST")
-
 }
 
 func (server *Server) init() {

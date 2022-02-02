@@ -1,4 +1,4 @@
-# GO Kill Process By Webserver
+# Silex GO Kill Process
 [![made-with-Go](https://img.shields.io/badge/Made%20with-Go-1f425f.svg)](http://golang.org)
 [![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/artfxdev/silex_GoKillProcess)](https://github.com/ArtFXDev/silex_GoKillProcess)
 

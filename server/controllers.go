@@ -7,15 +7,8 @@ import (
 	"os/exec"
 	"strconv"
 
-	"runtime/internal/sys"
-
 	"github.com/OlivierArgentieri/go_killprocess/responses"
 	"github.com/gorilla/mux"
-)
-
-const (
-	//go:linkname GOOS runtime.internal.sys.GOOS
-	GOOS = `unknown`
 )
 
 func (server *Server) KillProcess(w http.ResponseWriter, r *http.Request) {
@@ -40,9 +33,6 @@ func (server *Server) KillProcess(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-
-	// split between windows or linux
-	fmt.print(sys.GOOS)
 
 	kill := exec.Command("taskkill", "/F", "/PID", strconv.Itoa(int(pid)))
 	err = kill.Run()

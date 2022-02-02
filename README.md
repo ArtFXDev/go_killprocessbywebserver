@@ -1,4 +1,6 @@
-# go_killprocessbywebserver
+# GO Kill Process By Webserver
+[![made-with-Go](https://img.shields.io/badge/Made%20with-Go-1f425f.svg)](http://golang.org)
+[![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/artfxdev/go_killprocessbywebserver)](https://github.com/ArtFXDev/go_killprocessbywebserver)
 
 Webserver running locally, listenning on port 5119 to kill process by pid.
 

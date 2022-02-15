@@ -21,11 +21,6 @@ func (server *Server) KillProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
-		return
-	}
-
 	var obj = map[string]interface{}{}
 	err = json.Unmarshal(body, &obj)
 

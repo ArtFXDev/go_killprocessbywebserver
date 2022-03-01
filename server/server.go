@@ -23,3 +23,8 @@ func (server *Server) Run(addr string) {
 	fmt.Println("Listening at", addr)
 	log.Fatal(http.ListenAndServe(addr, server.Router))
 }
+
+func (server *Server) Stop(addr string) {
+	server.Stop(addr)
+	fmt.Println("Stopping at", addr)
+}

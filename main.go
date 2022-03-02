@@ -34,7 +34,7 @@ func main() {
 }
 
 func (p *program) Init(env svc.Environment) error {
-	// dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	// dir, err := filepath.Abs(filepath.Dir(os.Args[0])) todo
 	dir := "C:/"
 
 	logPath := filepath.Join(dir, "gokillprocess.log")

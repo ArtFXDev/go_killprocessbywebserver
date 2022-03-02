@@ -1,8 +1,6 @@
 package server
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os/exec"
@@ -13,20 +11,12 @@ import (
 )
 
 func (server *Server) KillProcess(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
 	log.Printf("Received kill request\n")
 	vars := mux.Vars(r)
 	pid, err := strconv.ParseUint(vars["pid"], 10, 64)
 	if err != nil {
-		responses.ERROR(w, http.StatusBadRequest, err)
 		log.Printf("ERROR when trying to parse pid parameter")
-		return
-	}
-
-	var obj = map[string]interface{}{}
-	err = json.Unmarshal(body, &obj)
-	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
 

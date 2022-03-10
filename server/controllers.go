@@ -1,11 +1,11 @@
 package server
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"os/exec"
 	"strconv"
-	"encoding/json"
 
 	"github.com/OlivierArgentieri/go_killprocess/responses"
 	"github.com/gorilla/mux"
@@ -38,7 +38,7 @@ func (server *Server) KillProcess(w http.ResponseWriter, r *http.Request) {
 func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received get processes request\n")
 
-	const cmd_powershell = `get-wmiObject Win32_PerfFormattedData_PerfProc_Process | ? {$_.Name -notlike '*_Total'} | ? {$_.Name -notlike '*Idle'} | ? {$_.PercentProcessorTime -gt '0'} | sort-object PercentProcessorTime -desc | select @{N='Name';E={$_.Name}}, @{N='CPU';E={$_.PercentProcessorTime}}, @{N='RAM';E={([math]::Round($_.WorkingSetPrivate/1Mb,2))}} | ConvertTo-Json`
+	const cmd_powershell = `get-wmiObject Win32_PerfFormattedData_PerfProc_Process | ? {$_.Name -notlike '*_Total'} | ? {$_.Name -notlike '*Idle'} | ? {$_.PercentProcessorTime -gt '0'} | sort-object PercentProcessorTime -desc | select @{N='Name';E={$_.Name}}, @{N='CPU';E={$_.PercentProcessorTime}}, @{N='RAM';E={([math]::Round($_.WorkingSetPrivate/1Mb,2))}}, @{N='PID';E={$_.CreatingProcessID}} | ConvertTo-Json`
 	const cmd_powershell_test = `write-output 'ddddddd'`
 
 	get_processes := exec.Command("powershell.exe", cmd_powershell)
@@ -58,18 +58,13 @@ func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 
 	type ProcessRow struct {
 		Name string
-		CPU float32
-		RAM float32
+		CPU  float32
+		RAM  float32
+		PID  float32
 	}
+	var rows []ProcessRow
+	json.Unmarshal([]byte(stdout), &rows)
 
-	err := json.Unmarshal(stdout, ProcessRow)
-	if err != nil {
-		responses.JSON(w, http.StatusOK, "Error when trying to reformat stdout json.")
-		log.Printf("Error when trying to reformat stdout json.")
-		log.Printf("Error reformat stdout json: ", err)
-		return
-	}
-
-	log.Printf("Ok get processes: ", string(beautifulJsonByte))
-	responses.JSON(w, http.StatusOK, base64.StdEncoding.DecodeString(beautifulJsonByte))
+	log.Printf("Ok get processes: ", rows)
+	responses.JSON(w, http.StatusOK, rows)
 }

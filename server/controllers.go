@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/OlivierArgentieri/go_killprocess/responses"
+	"github.com/OlivierArgentieri/go_killprocess/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -20,14 +21,12 @@ func (server *Server) KillProcess(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
+	var ipid = int(pid)
 
-	log.Println("Try to kill pid:", strconv.Itoa(int(pid)))
-	kill := exec.Command("taskkill", "/F", "/PID", strconv.Itoa(int(pid)))
-	err = kill.Run()
-
+	err = utils.Terminate(ipid)
 	if err != nil {
 		responses.JSON(w, http.StatusOK, "Error when trying to kill process, pls verify the requested PID")
-		log.Printf("Error when trying to kill process, pls verify the requested PID")
+		log.Printf("Error when trying to kill process, pls verify the requested PID, error: %v", err)
 		return
 	}
 
@@ -38,7 +37,7 @@ func (server *Server) KillProcess(w http.ResponseWriter, r *http.Request) {
 func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received get processes request\n")
 
-	const cmd_powershell = `get-wmiObject Win32_PerfFormattedData_PerfProc_Process | ? {$_.Name -notlike '*_Total'} | ? {$_.Name -notlike '*Idle'} | ? {$_.PercentProcessorTime -gt '0'} | sort-object PercentProcessorTime -desc | select @{N='Name';E={$_.Name}}, @{N='CPU';E={$_.PercentProcessorTime}}, @{N='RAM';E={([math]::Round($_.WorkingSetPrivate/1Mb,2))}}, @{N='PID';E={$_.CreatingProcessID}} | ConvertTo-Json`
+	const cmd_powershell = `get-wmiObject Win32_PerfFormattedData_PerfProc_Process | ? {$_.Name -notlike '*_Total'} | ? {$_.Name -notlike '*Idle'} | ? {$_.PercentProcessorTime -gt '0'} | sort-object PercentProcessorTime -desc | select @{N='Name';E={$_.Name}}, @{N='CPU';E={$_.PercentProcessorTime}}, @{N='RAM';E={([math]::Round($_.WorkingSetPrivate/1Mb,2))}}, @{N='PID';E={$_.IDProcess}} | ConvertTo-Json`
 
 	get_processes := exec.Command("powershell.exe", cmd_powershell)
 	log.Print(get_processes)
@@ -66,6 +65,7 @@ func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 	if stderr != nil {
 		log.Printf("Error when Unmarshal json: %v", stderr)
 		responses.JSON(w, http.StatusInternalServerError, "Error when Unmarshal json: ")
+		return
 	}
 	log.Printf("Ok get processes: %v", rows)
 	responses.JSON(w, http.StatusOK, rows)

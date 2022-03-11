@@ -39,7 +39,6 @@ func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received get processes request\n")
 
 	const cmd_powershell = `get-wmiObject Win32_PerfFormattedData_PerfProc_Process | ? {$_.Name -notlike '*_Total'} | ? {$_.Name -notlike '*Idle'} | ? {$_.PercentProcessorTime -gt '0'} | sort-object PercentProcessorTime -desc | select @{N='Name';E={$_.Name}}, @{N='CPU';E={$_.PercentProcessorTime}}, @{N='RAM';E={([math]::Round($_.WorkingSetPrivate/1Mb,2))}}, @{N='PID';E={$_.CreatingProcessID}} | ConvertTo-Json`
-	const cmd_powershell_test = `write-output 'ddddddd'`
 
 	get_processes := exec.Command("powershell.exe", cmd_powershell)
 	log.Print(get_processes)

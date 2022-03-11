@@ -49,10 +49,10 @@ func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 	//err := get_processes.Run()
 
 	if stderr != nil {
-		responses.JSON(w, http.StatusOK, "Error when trying to get list of process.")
+		responses.JSON(w, http.StatusInternalServerError, "Error when trying to get list of process.")
 		log.Printf("Error when trying to get list of process.")
-		log.Printf("err processes: ", stderr)
-		log.Printf("log processes: ", string(stdout))
+		log.Printf("err processes: %v ", stderr)
+		log.Printf("log processes: %v", string(stdout))
 		return
 	}
 
@@ -64,7 +64,10 @@ func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 	}
 	var rows []ProcessRow
 	json.Unmarshal([]byte(stdout), &rows)
-
-	log.Printf("Ok get processes: ", rows)
+	if stderr != nil {
+		log.Printf("Error when Unmarshal json: %v", stderr)
+		responses.JSON(w, http.StatusInternalServerError, "Error when Unmarshal json: ")
+	}
+	log.Printf("Ok get processes: %v", rows)
 	responses.JSON(w, http.StatusOK, rows)
 }

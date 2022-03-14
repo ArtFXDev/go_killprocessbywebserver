@@ -37,7 +37,7 @@ func (server *Server) KillProcess(w http.ResponseWriter, r *http.Request) {
 func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received get processes request\n")
 
-	const cmd_powershell = `ps | ? {$_.CPU -notlike $null -AND $_.CPU -gt 500} | foreach-Object {@{"Name"=$_.name;"PID"=$_.ID; "RAM"=$_.WS; "CPU"=$_.CPU}} | convertto-json`
+	var cmd_powershell = ` ps | foreach-Object {@{"Name"=$_.name;"PID"=$_.ID; "RAM"=$_.WS/1000000}} | ConvertTo-json`
 
 	get_processes := exec.Command("powershell.exe", cmd_powershell)
 	log.Print(get_processes)
@@ -54,7 +54,6 @@ func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 
 	type ProcessRow struct {
 		Name string
-		CPU  float32
 		RAM  float32
 		PID  float32
 	}

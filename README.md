@@ -14,7 +14,8 @@ This app is deployed as windows services in user system, with this setup, we jus
 ## Usage
 
 ```
-http://localhost:1159/kill/{YOUR_PID}
+post: http://localhost:1159/kill/{YOUR_PID}
+get: http://localhost:1159/processes
 ```
 Using postman 
 <p align="center">

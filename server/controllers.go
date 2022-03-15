@@ -25,7 +25,7 @@ func (server *Server) KillProcess(w http.ResponseWriter, r *http.Request) {
 
 	err = utils.Terminate(ipid)
 	if err != nil {
-		responses.JSON(w, http.StatusOK, "Error when trying to kill process, pls verify the requested PID")
+		responses.JSON(w, http.StatusInternalServerError, "Error when trying to kill process, pls verify the requested PID")
 		log.Printf("Error when trying to kill process, pls verify the requested PID, error: %v", err)
 		return
 	}

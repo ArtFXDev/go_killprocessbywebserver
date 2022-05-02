@@ -52,12 +52,12 @@ func (p *program) Init(env svc.Environment) error {
 
 func (p *program) Start() error {
 	log.Printf("Starting...\n")
-	go p.svr.Run(":5120")
+	go p.svr.Run(":5119")
 	return nil
 }
 
 func (p *program) Stop() error {
 	log.Printf("Stopping... \n")
-	go p.svr.Stop(":5120")
+	go p.svr.Stop(":5119")
 	return nil
 }

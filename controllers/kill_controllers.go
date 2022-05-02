@@ -1,4 +1,4 @@
-package server
+package controllers
 
 import (
 	"encoding/json"
@@ -57,6 +57,7 @@ func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 		RAM  float32
 		PID  float32
 	}
+
 	var rows []ProcessRow
 	json.Unmarshal([]byte(stdout), &rows)
 	if stderr != nil {

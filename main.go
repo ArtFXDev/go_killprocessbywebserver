@@ -6,13 +6,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/OlivierArgentieri/go_killprocess/server"
+	"github.com/OlivierArgentieri/go_killprocess/controllers"
 	"github.com/judwhite/go-svc"
 )
 
 type program struct {
 	LogFile *os.File
-	svr     *server.Server
+	svr     *controllers.Server
 	ctx     context.Context
 }
 
@@ -24,7 +24,7 @@ func main() {
 	ctx := context.Background()
 
 	prg := program{
-		svr: &server.Server{},
+		svr: &controllers.Server{},
 		ctx: ctx,
 	}
 
@@ -52,12 +52,12 @@ func (p *program) Init(env svc.Environment) error {
 
 func (p *program) Start() error {
 	log.Printf("Starting...\n")
-	go p.svr.Run(":5119")
+	go p.svr.Run(":5120")
 	return nil
 }
 
 func (p *program) Stop() error {
 	log.Printf("Stopping... \n")
-	go p.svr.Stop(":5119")
+	go p.svr.Stop(":5120")
 	return nil
 }

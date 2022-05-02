@@ -1,4 +1,4 @@
-package server
+package controllers
 
 import (
 	"fmt"
@@ -25,6 +25,5 @@ func (server *Server) Run(addr string) {
 }
 
 func (server *Server) Stop(addr string) {
-	server.Stop(addr)
 	fmt.Println("Stopping at", addr)
 }

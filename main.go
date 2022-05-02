@@ -6,13 +6,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/OlivierArgentieri/go_killprocess/server"
+	"github.com/OlivierArgentieri/go_killprocess/controllers"
 	"github.com/judwhite/go-svc"
 )
 
 type program struct {
 	LogFile *os.File
-	svr     *server.Server
+	svr     *controllers.Server
 	ctx     context.Context
 }
 
@@ -24,7 +24,7 @@ func main() {
 	ctx := context.Background()
 
 	prg := program{
-		svr: &server.Server{},
+		svr: &controllers.Server{},
 		ctx: ctx,
 	}
 

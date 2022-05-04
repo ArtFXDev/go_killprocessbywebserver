@@ -45,11 +45,12 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 	// request local blade
 	var real_value = "0"
 
-	log.Printf("%t", *currentStatus.Value)
+	// convert true to 1 and false to 0
 	if *currentStatus.Value {
 		real_value = "1"
 	}
 
+	// route for local blade (todo: read from config file)
 	res, err := http.Get(fmt.Sprintf("http://localhost:9005/blade/ctrl?nimby=%s", real_value))
 
 	if err != nil {
@@ -57,17 +58,21 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 	}
 
+	// read body response of blade status request
 	body, err = ioutil.ReadAll(res.Body)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 	}
+	// response is in json so we need to decode it and convet tu byte
 	raw_json := []byte(string(body))
 
 	var dat map[string]interface{}
+	// unmarshal
 	if err := json.Unmarshal(raw_json, &dat); err != nil {
 		panic(err)
 	}
 
+	// return response of blade to response of request
 	responses.JSON(w, http.StatusOK, dat)
 }
 

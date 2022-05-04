@@ -19,23 +19,16 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 	}
 
-	currentStatus := model.NimbyStatus{}
-	err = json.Unmarshal(body, &currentStatus)
+	currentStatus := model.NewNimbyStatus()
+	receiveStatus := model.NewNimbyStatus()
+	err = json.Unmarshal(body, &receiveStatus)
 	if err != nil {
 		log.Printf("[NIMBY] Setting Nimby value \n")
 	}
 
-	if currentStatus.Value != nil {
-		log.Printf("[NIMBY] Setting Nimby value to: %t \n", *currentStatus.Value)
-	}
-
-	if currentStatus.Mode != nil {
-		log.Printf("[NIMBY] Setting Nimby value to: %s \n", *currentStatus.Mode)
-	}
-
-	if currentStatus.Reason != nil {
-		log.Printf("[NIMBY] Setting Nimby value to: %s \n", *currentStatus.Reason)
-	}
+	log.Printf("%t, %s, %s", currentStatus.GetValue(), currentStatus.GetMode(), currentStatus.GetReason())
+	currentStatus.Merge(&receiveStatus)
+	log.Printf("%t, %s, %s", currentStatus.GetValue(), currentStatus.GetMode(), currentStatus.GetReason())
 
 	// request local blade
 	var real_value = "0"

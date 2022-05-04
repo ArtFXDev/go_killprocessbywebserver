@@ -11,5 +11,5 @@ func (server *Server) initRoutes() {
 
 	// Nimby
 	server.Router.HandleFunc("/status", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareCORS(server.GetProcesses))).Methods("GET")
-	server.Router.HandleFunc("/status", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareCORS(server.GetProcesses))).Methods("POST")
+	server.Router.HandleFunc("/status", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareCORS(server.SetNimbyStatus))).Methods("POST")
 }

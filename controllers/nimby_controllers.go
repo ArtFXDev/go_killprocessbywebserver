@@ -7,14 +7,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/OlivierArgentieri/go_killprocess/model"
 	"github.com/OlivierArgentieri/go_killprocess/responses"
 )
-
-type CurrentStatus struct {
-	Value  *bool   `json:"value"`
-	Mode   *string `json:"mode"`
-	Reason *string `json:"reason"`
-}
 
 func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received SetNimbyStatus request\n")
@@ -24,7 +19,7 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 	}
 
-	currentStatus := CurrentStatus{}
+	currentStatus := model.NimbyStatus{}
 	err = json.Unmarshal(body, &currentStatus)
 	if err != nil {
 		log.Printf("[NIMBY] Setting Nimby value \n")

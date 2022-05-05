@@ -9,25 +9,15 @@ import (
 
 var lock = &sync.Mutex{}
 
-// type Store interface{}
+var storeInstance *model.Store
 
-type Store struct {
-	NimbyStatus *model.NimbyStatus
-}
-
-var storeInstance *Store
-
-func newStoreInstance() *Store {
-	return &Store{model.NewNimbyStatus()}
-}
-
-func GetInstance() *Store {
+func GetInstance() *model.Store {
 	if storeInstance == nil {
 		lock.Lock()
 		defer lock.Unlock()
 		if storeInstance == nil {
 			log.Printf("Create instance")
-			storeInstance = newStoreInstance()
+			storeInstance = model.NewStoreInstance()
 		} else {
 			log.Printf("already created")
 		}

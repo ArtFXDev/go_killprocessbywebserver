@@ -2,14 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 
 	"github.com/OlivierArgentieri/go_killprocess/models"
 	"github.com/OlivierArgentieri/go_killprocess/responses"
-	"github.com/spf13/viper"
 )
 
 func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
@@ -33,26 +31,9 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 	currentStatus.Merge(receiveStatus)
 	log.Printf("to: %t, %s, %s", currentStatus.GetValue(), currentStatus.GetMode(), currentStatus.GetReason())
 
-	// request local blade
-	var real_value = "0"
+	// flush data to local blade process
+	body, err = currentStatus.FlushToNimbyProcess()
 
-	// convert true to 1 and false to 0
-	if *currentStatus.Value {
-		real_value = "1"
-	}
-
-	res, err := http.Get(fmt.Sprintf("%s/blade/ctrl?nimby=%s", viper.GetString("nimby.bladeURL"), real_value))
-
-	if err != nil {
-		log.Printf("[NIMBY] error setting currentStatus on local blade process \n")
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
-	}
-
-	// read body response of blade status request
-	body, err = ioutil.ReadAll(res.Body)
-	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
-	}
 	// response is in json so we need to decode it and convet tu byte
 	raw_json := []byte(string(body))
 

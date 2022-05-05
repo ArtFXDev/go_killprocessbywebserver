@@ -9,6 +9,7 @@ import (
 
 	"github.com/OlivierArgentieri/go_killprocess/model"
 	"github.com/OlivierArgentieri/go_killprocess/responses"
+	"github.com/spf13/viper"
 )
 
 func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
@@ -40,8 +41,7 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 		real_value = "1"
 	}
 
-	// route for local blade (todo: read from config file)
-	res, err := http.Get(fmt.Sprintf("http://localhost:9005/blade/ctrl?nimby=%s", real_value))
+	res, err := http.Get(fmt.Sprintf("%s/blade/ctrl?nimby=%s", viper.GetString("nimby.bladeURL"), real_value))
 
 	if err != nil {
 		log.Printf("[NIMBY] error setting currentStatus on local blade process \n")

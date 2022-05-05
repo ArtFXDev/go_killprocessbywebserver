@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/OlivierArgentieri/go_killprocess/model"
+	"github.com/OlivierArgentieri/go_killprocess/models"
 	"github.com/OlivierArgentieri/go_killprocess/responses"
 	"github.com/spf13/viper"
 )
@@ -20,10 +20,10 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 	}
 
-	temp_store := model.GetStoreInstance()
+	temp_store := models.GetStoreInstance()
 
 	currentStatus := temp_store.NimbyStatus
-	receiveStatus := model.NewNimbyStatus()
+	receiveStatus := models.NewNimbyStatus()
 	err = json.Unmarshal(body, &receiveStatus)
 	if err != nil {
 		log.Printf("[NIMBY] Setting Nimby value \n")

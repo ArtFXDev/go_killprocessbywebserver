@@ -9,7 +9,6 @@ import (
 
 	"github.com/OlivierArgentieri/go_killprocess/model"
 	"github.com/OlivierArgentieri/go_killprocess/responses"
-	"github.com/OlivierArgentieri/go_killprocess/store"
 )
 
 func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +19,7 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 	}
 
-	temp_store := store.GetInstance()
+	temp_store := model.GetStoreInstance()
 
 	currentStatus := temp_store.NimbyStatus
 	receiveStatus := model.NewNimbyStatus()
@@ -29,9 +28,9 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[NIMBY] Setting Nimby value \n")
 	}
 
-	log.Printf("%t, %s, %s", currentStatus.GetValue(), currentStatus.GetMode(), currentStatus.GetReason())
+	log.Printf("Update nimby status from: %t, %s, %s", currentStatus.GetValue(), currentStatus.GetMode(), currentStatus.GetReason())
 	currentStatus.Merge(receiveStatus)
-	log.Printf("%t, %s, %s", currentStatus.GetValue(), currentStatus.GetMode(), currentStatus.GetReason())
+	log.Printf("to: %t, %s, %s", currentStatus.GetValue(), currentStatus.GetMode(), currentStatus.GetReason())
 
 	// request local blade
 	var real_value = "0"

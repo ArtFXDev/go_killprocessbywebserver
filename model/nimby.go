@@ -1,18 +1,18 @@
 package model
 
-type NimbyStatus interface{}
+// type NimbyStatus interface {}
 
-type nimbyStatus struct {
+type NimbyStatus struct {
 	Value  *bool   `json:"value"`
 	Mode   *string `json:"mode"`
 	Reason *string `json:"reason"`
 }
 
-func NewNimbyStatus() nimbyStatus {
-	return nimbyStatus{&[]bool{true}[0], &[]string{"auto"}[0], &[]string{"Default status"}[0]}
+func NewNimbyStatus() *NimbyStatus {
+	return &NimbyStatus{&[]bool{true}[0], &[]string{"auto"}[0], &[]string{"Default status"}[0]}
 }
 
-func (status *nimbyStatus) Merge(otherStatus *nimbyStatus) {
+func (status *NimbyStatus) Merge(otherStatus *NimbyStatus) {
 	if otherStatus.Value != nil {
 		status.Value = otherStatus.Value
 	}
@@ -26,14 +26,14 @@ func (status *nimbyStatus) Merge(otherStatus *nimbyStatus) {
 	}
 }
 
-func (status *nimbyStatus) GetValue() bool {
+func (status *NimbyStatus) GetValue() bool {
 	return *status.Value
 }
 
-func (status *nimbyStatus) GetMode() string {
+func (status *NimbyStatus) GetMode() string {
 	return *status.Mode
 }
 
-func (status *nimbyStatus) GetReason() string {
+func (status *NimbyStatus) GetReason() string {
 	return *status.Reason
 }

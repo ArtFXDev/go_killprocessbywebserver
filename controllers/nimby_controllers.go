@@ -9,6 +9,7 @@ import (
 
 	"github.com/OlivierArgentieri/go_killprocess/model"
 	"github.com/OlivierArgentieri/go_killprocess/responses"
+	"github.com/OlivierArgentieri/go_killprocess/store"
 )
 
 func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +20,9 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 	}
 
-	currentStatus := model.NewNimbyStatus()
+	temp_store := store.GetInstance()
+
+	currentStatus := temp_store.NimbyStatus
 	receiveStatus := model.NewNimbyStatus()
 	err = json.Unmarshal(body, &receiveStatus)
 	if err != nil {
@@ -27,7 +30,7 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("%t, %s, %s", currentStatus.GetValue(), currentStatus.GetMode(), currentStatus.GetReason())
-	currentStatus.Merge(&receiveStatus)
+	currentStatus.Merge(receiveStatus)
 	log.Printf("%t, %s, %s", currentStatus.GetValue(), currentStatus.GetMode(), currentStatus.GetReason())
 
 	// request local blade

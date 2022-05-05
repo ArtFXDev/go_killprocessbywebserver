@@ -1,29 +1,38 @@
 package store
 
 import (
-	"fmt"
+	"log"
 	"sync"
+
+	"github.com/OlivierArgentieri/go_killprocess/model"
 )
 
 var lock = &sync.Mutex{}
 
+// type Store interface{}
+
 type Store struct {
+	NimbyStatus *model.NimbyStatus
 }
 
 var storeInstance *Store
 
-func getInstance() *Store {
+func newStoreInstance() *Store {
+	return &Store{model.NewNimbyStatus()}
+}
+
+func GetInstance() *Store {
 	if storeInstance == nil {
 		lock.Lock()
 		defer lock.Unlock()
 		if storeInstance == nil {
-			fmt.Println("Create instance")
-			storeInstance = &Store{}
+			log.Printf("Create instance")
+			storeInstance = newStoreInstance()
 		} else {
-			fmt.Println("already created")
+			log.Printf("already created")
 		}
 	} else {
-		fmt.Println("already created")
+		log.Printf("already created")
 	}
 
 	return storeInstance

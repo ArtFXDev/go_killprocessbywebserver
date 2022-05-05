@@ -33,6 +33,9 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 
 	// flush data to local blade process
 	body, err = currentStatus.FlushToNimbyProcess()
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+	}
 
 	// response is in json so we need to decode it and convet tu byte
 	raw_json := []byte(string(body))
@@ -40,7 +43,7 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 	var dat map[string]interface{}
 	// unmarshal
 	if err := json.Unmarshal(raw_json, &dat); err != nil {
-		panic(err)
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 	}
 
 	// return response of blade to response of request
@@ -50,4 +53,10 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 func (server *Server) GetBladeStatus(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received kill request\n")
 	responses.JSON(w, http.StatusOK, nil)
+}
+
+func (server *Server) TestTemp(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Received kill request\n")
+	a := &models.AutoMode{}
+	a.TestUsageDelay()
 }

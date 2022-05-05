@@ -8,20 +8,22 @@ type AutoMode struct {
 }
 type testFunc func(chan *NimbyStatus)
 
-func (am *AutoMode) testRunningProcess(ns chan *NimbyStatus) {
+func (am *AutoMode) testRunningProcess(nsc chan *NimbyStatus) {
 	temp_nimby := NewNimbyStatus()
-	ns <- temp_nimby
+	temp_nimby.SetReason("testRunningProcess")
+	nsc <- temp_nimby
 }
 
-func (am *AutoMode) testAnother(ns chan *NimbyStatus) {
+func (am *AutoMode) testAnother(nsc chan *NimbyStatus) {
 	temp_nimby := NewNimbyStatus()
-	ns <- temp_nimby
+	temp_nimby.SetReason("testAnother")
+	nsc <- temp_nimby
 }
 
-func (am *AutoMode) testUsageDelay() {
+func (am *AutoMode) TestUsageDelay() {
 	log.Printf("[NIMBY] Day mode usage check ...")
 
-	// var c chan *NimbyStatus = make(chan *NimbyStatus)
+	var c chan *NimbyStatus = make(chan *NimbyStatus)
 
 	checks := []testFunc{
 		am.testRunningProcess,
@@ -29,6 +31,7 @@ func (am *AutoMode) testUsageDelay() {
 	}
 
 	for n := range checks {
-		go checks[n](nil)
+		go checks[n](c)
+		go FlushByChannel(c)
 	}
 }

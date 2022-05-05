@@ -49,15 +49,18 @@ func (status *NimbyStatus) GetReason() string {
 
 func (status *NimbyStatus) SetValue(v bool) {
 	status.Value = &[]bool{v}[0]
+	GetStoreInstance().NimbyStatus.Value = &[]bool{v}[0]
 }
 
 func (status *NimbyStatus) SetMode(v string) {
 	// todo make mode as Enum
 	status.Mode = &[]string{v}[0]
+	GetStoreInstance().NimbyStatus.Mode = &[]string{v}[0]
 }
 
 func (status *NimbyStatus) SetReason(v string) {
 	status.Reason = &[]string{v}[0]
+	GetStoreInstance().NimbyStatus.Reason = &[]string{v}[0]
 }
 
 func (status *NimbyStatus) FlushToNimbyProcess() ([]byte, error) {
@@ -73,15 +76,29 @@ func (status *NimbyStatus) FlushToNimbyProcess() ([]byte, error) {
 	res, err := http.Get(fmt.Sprintf("%s/blade/ctrl?nimby=%s", viper.GetString("nimby.bladeURL"), real_value))
 
 	if err != nil {
-		log.Printf("[NIMBY] error setting currentStatus on local blade process \n")
+		log.Println("[NIMBY] error setting currentStatus on local blade process")
 		return []byte{}, err
 	}
 
 	// read body response of blade status request
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
+		log.Println("[NIMBY] error setting currentStatus on local blade process")
 		return []byte{}, err
 	}
 
 	return body, nil
+}
+
+func FlushByChannel(nsc chan *NimbyStatus) {
+	receive_NimbyStatus := <-nsc
+	log.Println("[NIMBY] FlushByChannel receive from goroutine to local nimby process")
+
+	receive_NimbyStatus.FlushToNimbyProcess()
+	temp_store := GetStoreInstance()
+	temp_store.NimbyStatus.Merge(receive_NimbyStatus)
+
+	log.Printf("Update nimby status from: %t, %s, %s", temp_store.NimbyStatus.GetValue(), temp_store.NimbyStatus.GetMode(), temp_store.NimbyStatus.GetReason())
+	log.Printf("To: %t, %s, %s", receive_NimbyStatus.GetValue(), receive_NimbyStatus.GetMode(), receive_NimbyStatus.GetReason())
+
 }

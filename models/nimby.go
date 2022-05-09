@@ -11,27 +11,41 @@ import (
 
 // type NimbyStatus interface {}
 
+type NimbyStatusMode string
+
+const (
+	AUTO   NimbyStatusMode = "auto"
+	MANUAL NimbyStatusMode = "manual"
+)
+
 type NimbyStatus struct {
-	Value  *bool   `json:"value"`
-	Mode   *string `json:"mode"`
-	Reason *string `json:"reason"`
+	Value  *bool            `json:"value"`
+	Mode   *NimbyStatusMode `json:"mode"`
+	Reason *string          `json:"reason"`
+
+	AutoMode *AutoMode
 }
 
 func NewNimbyStatus() *NimbyStatus {
-	return &NimbyStatus{&[]bool{true}[0], &[]string{"auto"}[0], &[]string{"Default status"}[0]}
+	return &NimbyStatus{
+		&[]bool{true}[0],
+		&[]NimbyStatusMode{AUTO}[0],
+		&[]string{"Default status"}[0],
+		&AutoMode{},
+	}
 }
 
 func (status *NimbyStatus) Merge(otherStatus *NimbyStatus) {
 	if otherStatus.Value != nil {
-		status.Value = otherStatus.Value
+		status.SetValue(*otherStatus.Value)
 	}
 
 	if otherStatus.Mode != nil {
-		status.Mode = otherStatus.Mode
+		status.SetMode(*otherStatus.Mode)
 	}
 
 	if otherStatus.Reason != nil {
-		status.Reason = otherStatus.Reason
+		status.SetReason(*otherStatus.Reason)
 	}
 }
 
@@ -39,7 +53,7 @@ func (status *NimbyStatus) GetValue() bool {
 	return *status.Value
 }
 
-func (status *NimbyStatus) GetMode() string {
+func (status *NimbyStatus) GetMode() NimbyStatusMode {
 	return *status.Mode
 }
 
@@ -52,10 +66,17 @@ func (status *NimbyStatus) SetValue(v bool) {
 	GetStoreInstance().NimbyStatus.Value = &[]bool{v}[0]
 }
 
-func (status *NimbyStatus) SetMode(v string) {
+func (status *NimbyStatus) SetMode(v NimbyStatusMode) {
 	// todo make mode as Enum
-	status.Mode = &[]string{v}[0]
-	GetStoreInstance().NimbyStatus.Mode = &[]string{v}[0]
+	status.Mode = &[]NimbyStatusMode{v}[0]
+	GetStoreInstance().NimbyStatus.Mode = &[]NimbyStatusMode{v}[0]
+
+	if *(status.Mode) == AUTO {
+		go status.AutoMode.StartLoop()
+	} else {
+		go status.AutoMode.StopLoop()
+	}
+
 }
 
 func (status *NimbyStatus) SetReason(v string) {

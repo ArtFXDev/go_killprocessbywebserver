@@ -56,7 +56,6 @@ func (server *Server) GetBladeStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) TestTemp(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Received kill request\n")
-	a := &models.AutoMode{}
-	a.TestUsageDelay()
+	log.Printf("Received test request\n")
+
 }

@@ -2,13 +2,13 @@ package models
 
 import (
 	"log"
-	"time"
+
+	"github.com/OlivierArgentieri/go_killprocess/utils"
 )
 
 type AutoMode struct {
 	// private
-	ticker        *time.Ticker
-	tickerChannel chan bool
+	si *utils.SetInterval
 
 	// public
 	Name     string
@@ -17,19 +17,22 @@ type AutoMode struct {
 type testFunc func(chan *NimbyStatus)
 
 func (am *AutoMode) testRunningProcess(nsc chan *NimbyStatus) {
+	log.Println("testRunningProcess")
 	temp_nimby := NewNimbyStatus()
 	temp_nimby.SetReason("testRunningProcess")
 	nsc <- temp_nimby
 }
 
 func (am *AutoMode) testCPUUSage(nsc chan *NimbyStatus) {
+	log.Println("testCPUUSage")
+
 	temp_nimby := NewNimbyStatus()
 	temp_nimby.SetReason("testAnother")
 	nsc <- temp_nimby
 }
 
 func (am *AutoMode) testUsageDelay() {
-	log.Printf("[NIMBY] Day mode usage check ...")
+	log.Printf("testUsageDelay")
 
 	var c chan *NimbyStatus = make(chan *NimbyStatus)
 
@@ -40,42 +43,37 @@ func (am *AutoMode) testUsageDelay() {
 
 	for n := range checks {
 		go checks[n](c)
-		go FlushByChannel(c)
+		FlushByChannel(c)
 	}
+}
+
+func (am *AutoMode) IsValid() bool {
+	return am.si != nil
 }
 
 func (am *AutoMode) StartLoop() {
-	log.Printf("[NIMBY] start loop ...")
-	log.Printf("[NIMBY]")
 
-	// init if ticker object is null
-	if am.ticker == nil {
-		//interval := viper.GetInt("nimby.autoMode.usageCheckInterval")
-		am.ticker = time.NewTicker(time.Second)
+	if am.IsValid() && am.si.IsRunning() {
+		log.Println("already running")
+		return
 	}
 
-	go func() {
-		for {
-			select {
-			case <-am.tickerChannel:
-				log.Printf("[NIMBY] ssssssss loop ...")
-				return
-
-			case <-am.ticker.C:
-				am.testUsageDelay()
-				log.Printf("[NIMBY] aaaaaas..")
-				log.Printf("[NIMBY]")
-			}
-		}
-	}()
+	am.si = &utils.SetInterval{}
+	am.si.Start(am.testUsageDelay, 1000, false)
 }
 
 func (am *AutoMode) StopLoop() {
-	am.ticker.Stop()
-	am.tickerChannel <- true
-}
 
-func (am *AutoMode) IsRunning() bool {
-	v := <-am.tickerChannel
-	return !v
+	if !am.IsValid() {
+		return
+	}
+
+	// already stopped
+	if !am.si.IsRunning() {
+		return
+	}
+
+	log.Println("Stopping loop")
+
+	am.si.Stop()
 }

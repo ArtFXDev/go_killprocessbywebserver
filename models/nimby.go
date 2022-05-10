@@ -67,16 +67,17 @@ func (status *NimbyStatus) SetValue(v bool) {
 }
 
 func (status *NimbyStatus) SetMode(v NimbyStatusMode) {
+	log.Println("[NIMBY] call setMode")
+
 	// todo make mode as Enum
 	status.Mode = &[]NimbyStatusMode{v}[0]
 	GetStoreInstance().NimbyStatus.Mode = &[]NimbyStatusMode{v}[0]
 
 	if *(status.Mode) == AUTO {
-		go status.AutoMode.StartLoop()
+		status.AutoMode.StartLoop()
 	} else {
-		go status.AutoMode.StopLoop()
+		status.AutoMode.StopLoop()
 	}
-
 }
 
 func (status *NimbyStatus) SetReason(v string) {

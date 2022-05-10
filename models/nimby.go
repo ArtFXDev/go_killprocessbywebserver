@@ -14,8 +14,8 @@ import (
 type NimbyStatusMode string
 
 const (
-	AUTO   NimbyStatusMode = "auto"
-	MANUAL NimbyStatusMode = "manual"
+	NIMBY_AUTO   NimbyStatusMode = "auto"
+	NIMBY_MANUAL NimbyStatusMode = "manual"
 )
 
 type NimbyStatus struct {
@@ -29,7 +29,7 @@ type NimbyStatus struct {
 func NewNimbyStatus() *NimbyStatus {
 	return &NimbyStatus{
 		&[]bool{true}[0],
-		&[]NimbyStatusMode{AUTO}[0],
+		&[]NimbyStatusMode{NIMBY_AUTO}[0],
 		&[]string{"Default status"}[0],
 		&AutoMode{},
 	}
@@ -73,7 +73,7 @@ func (status *NimbyStatus) SetMode(v NimbyStatusMode) {
 	status.Mode = &[]NimbyStatusMode{v}[0]
 	GetStoreInstance().NimbyStatus.Mode = &[]NimbyStatusMode{v}[0]
 
-	if *(status.Mode) == AUTO {
+	if *(status.Mode) == NIMBY_AUTO {
 		status.AutoMode.StartLoop()
 	} else {
 		status.AutoMode.StopLoop()

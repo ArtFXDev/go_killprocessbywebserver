@@ -25,7 +25,6 @@ func (si *SetInterval) Start(someFunc func(), milliseconds int, async bool) chan
 	// so that the for loop is none blocking
 	go func() {
 		for {
-
 			select {
 			case <-si.tickerChannel:
 				si.isRunning = false
@@ -40,7 +39,6 @@ func (si *SetInterval) Start(someFunc func(), milliseconds int, async bool) chan
 					// This will block
 					someFunc()
 				}
-
 			}
 		}
 	}()

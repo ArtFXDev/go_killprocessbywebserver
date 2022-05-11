@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/OlivierArgentieri/go_killprocess/utils"
+	"github.com/spf13/viper"
 )
 
 type AutoMode struct {
@@ -27,7 +28,24 @@ func (am *AutoMode) testCPUUSage(nsc chan *NimbyStatus) {
 	log.Println("testCPUUSage")
 
 	temp_nimby := NewNimbyStatus()
-	temp_nimby.SetReason("testAnother")
+	usage, err := utils.GetCPUUsage()
+	if err != nil {
+		log.Printf("Error test usage: %s", err)
+		return
+	}
+
+	if usage > viper.GetInt("nimby.automode.maxCPUUsage") {
+		log.Printf("High CPU USAGE: turn off nimby %s", err)
+		temp_nimby.SetReason("High CPU Usage")
+		temp_nimby.SetMode(NIMBY_MANUAL)
+		temp_nimby.SetValue(false)
+	} else {
+		log.Printf("LOW CPU USAGE: turn on nimby %s", err)
+		temp_nimby.SetReason("Low CPU Usage")
+		temp_nimby.SetMode(NIMBY_AUTO)
+		temp_nimby.SetValue(true)
+	}
+
 	nsc <- temp_nimby
 }
 
@@ -53,13 +71,18 @@ func (am *AutoMode) IsValid() bool {
 
 func (am *AutoMode) StartLoop() {
 
-	if am.IsValid() && am.si.IsRunning() {
+	if !am.IsValid() {
+		am.si = &utils.SetInterval{}
+	}
+
+	if am.si.IsRunning() {
 		log.Println("already running")
 		return
 	}
 
-	am.si = &utils.SetInterval{}
-	am.si.Start(am.testUsageDelay, 1000, false)
+	delay := viper.GetInt("nimby.automode.usageCheckInterval")
+	log.Println(delay)
+	am.si.Start(am.testUsageDelay, delay, true)
 }
 
 func (am *AutoMode) StopLoop() {

@@ -27,12 +27,15 @@ type NimbyStatus struct {
 }
 
 func NewNimbyStatus() *NimbyStatus {
-	return &NimbyStatus{
+	instance := &NimbyStatus{
 		&[]bool{true}[0],
 		&[]NimbyStatusMode{NIMBY_AUTO}[0],
 		&[]string{"Default status"}[0],
 		&AutoMode{},
 	}
+
+	//	instance.AutoMode.StartLoop()
+	return instance
 }
 
 func (status *NimbyStatus) Merge(otherStatus *NimbyStatus) {
@@ -69,7 +72,6 @@ func (status *NimbyStatus) SetValue(v bool) {
 func (status *NimbyStatus) SetMode(v NimbyStatusMode) {
 	log.Println("[NIMBY] call setMode")
 
-	// todo make mode as Enum
 	status.Mode = &[]NimbyStatusMode{v}[0]
 	GetStoreInstance().NimbyStatus.Mode = &[]NimbyStatusMode{v}[0]
 

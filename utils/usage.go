@@ -2,8 +2,8 @@ package utils
 
 import (
 	"os/exec"
+	"regexp"
 	"strconv"
-	"strings"
 )
 
 func GetCPUUsage() (int, error) {
@@ -11,9 +11,11 @@ func GetCPUUsage() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	beforeint := strings.ReplaceAll(string(result), "loadpercentage", "")
 
-	intValue, err := strconv.Atoi(beforeint)
+	// get number in result
+	r, _ := regexp.Compile(`\d+`)
+	onlyValue := r.Find(result)
+	intValue, err := strconv.Atoi(string(onlyValue))
 	if err != nil {
 		return 0, err
 	}

@@ -7,11 +7,13 @@ import (
 // type Store interface{}
 
 type Store struct {
-	NimbyStatus *NimbyStatus
+	NimbyStatus   *NimbyStatus
+	loopIsRunning bool
 }
 
 func newStoreInstance() *Store {
-	return &Store{NewNimbyStatus()}
+	newStatus := NewNimbyStatus()
+	return &Store{newStatus, false}
 }
 
 var lock = &sync.Mutex{}

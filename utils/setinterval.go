@@ -1,6 +1,8 @@
 package utils
 
-import "time"
+import (
+	"time"
+)
 
 type SetInterval struct {
 	// private
@@ -19,8 +21,8 @@ func (si *SetInterval) Start(someFunc func(), milliseconds int, async bool) chan
 	// the ending of the interval
 	si.ticker = time.NewTicker(interval)
 	si.tickerChannel = make(chan bool)
-	si.isRunning = true
 
+	si.isRunning = true
 	// Put the selection in a go routine
 	// so that the for loop is none blocking
 	go func() {
@@ -32,6 +34,8 @@ func (si *SetInterval) Start(someFunc func(), milliseconds int, async bool) chan
 				return
 
 			case <-si.ticker.C:
+
+				si.isRunning = true
 				if async {
 					// This won't block
 					go someFunc()

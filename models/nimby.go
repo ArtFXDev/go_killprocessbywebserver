@@ -10,7 +10,6 @@ import (
 )
 
 // type NimbyStatus interface {}
-
 type NimbyStatusMode string
 
 const (
@@ -33,12 +32,13 @@ func NewNimbyStatus() *NimbyStatus {
 		&[]string{"Default status"}[0],
 		&AutoMode{},
 	}
-
 	//	instance.AutoMode.StartLoop()
 	return instance
 }
 
 func (status *NimbyStatus) Merge(otherStatus *NimbyStatus) {
+	log.Println("[NIMBY] call Merge")
+
 	if otherStatus.Value != nil {
 		status.SetValue(*otherStatus.Value)
 	}

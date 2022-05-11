@@ -10,12 +10,18 @@ import (
 type AutoMode struct {
 	// private
 	si *utils.SetInterval
+	c  chan *NimbyStatus
 
 	// public
 	Name     string
 	Interval string
 }
 type testFunc func(chan *NimbyStatus)
+
+func (am *AutoMode) initAutoMode() {
+	am.si = &utils.SetInterval{}
+	am.c = make(chan *NimbyStatus)
+}
 
 func (am *AutoMode) testRunningProcess(nsc chan *NimbyStatus) {
 	log.Println("testRunningProcess")
@@ -25,6 +31,7 @@ func (am *AutoMode) testRunningProcess(nsc chan *NimbyStatus) {
 }
 
 func (am *AutoMode) testCPUUSage(nsc chan *NimbyStatus) {
+
 	log.Println("testCPUUSage")
 
 	temp_nimby := NewNimbyStatus()
@@ -35,12 +42,12 @@ func (am *AutoMode) testCPUUSage(nsc chan *NimbyStatus) {
 	}
 
 	if usage > viper.GetInt("nimby.automode.maxCPUUsage") {
-		log.Printf("High CPU USAGE: turn off nimby %s", err)
+		log.Printf("High CPU USAGE: turn off nimby")
 		temp_nimby.SetReason("High CPU Usage")
 		temp_nimby.SetMode(NIMBY_MANUAL)
 		temp_nimby.SetValue(false)
 	} else {
-		log.Printf("LOW CPU USAGE: turn on nimby %s", err)
+		log.Printf("LOW CPU USAGE: turn on nimby")
 		temp_nimby.SetReason("Low CPU Usage")
 		temp_nimby.SetMode(NIMBY_AUTO)
 		temp_nimby.SetValue(true)
@@ -51,17 +58,14 @@ func (am *AutoMode) testCPUUSage(nsc chan *NimbyStatus) {
 
 func (am *AutoMode) testUsageDelay() {
 	log.Printf("testUsageDelay")
-
-	var c chan *NimbyStatus = make(chan *NimbyStatus)
-
 	checks := []testFunc{
-		am.testRunningProcess,
 		am.testCPUUSage,
+		am.testRunningProcess,
 	}
 
 	for n := range checks {
-		go checks[n](c)
-		FlushByChannel(c)
+		checks[n](am.c)
+		FlushByChannel(am.c)
 	}
 }
 
@@ -72,7 +76,7 @@ func (am *AutoMode) IsValid() bool {
 func (am *AutoMode) StartLoop() {
 
 	if !am.IsValid() {
-		am.si = &utils.SetInterval{}
+		am.initAutoMode()
 	}
 
 	if am.si.IsRunning() {
@@ -81,8 +85,7 @@ func (am *AutoMode) StartLoop() {
 	}
 
 	delay := viper.GetInt("nimby.automode.usageCheckInterval")
-	log.Println(delay)
-	am.si.Start(am.testUsageDelay, delay, true)
+	am.si.Start(am.testUsageDelay, delay, false)
 }
 
 func (am *AutoMode) StopLoop() {

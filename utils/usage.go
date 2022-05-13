@@ -21,5 +21,4 @@ func GetCPUUsage() (int, error) {
 	}
 
 	return intValue, nil
-
 }

@@ -25,8 +25,14 @@ func (am *AutoMode) initAutoMode() {
 
 func (am *AutoMode) testRunningProcess(nsc chan *NimbyStatus) {
 	log.Println("testRunningProcess")
+
+	result, err := utils.GetRunningProcess()
+	if err != nil {
+		log.Printf("Error test usage: %s", err)
+		return
+	}
+	log.Print(result)
 	temp_nimby := NewNimbyStatus()
-	temp_nimby.SetReason("testRunningProcess")
 	nsc <- temp_nimby
 }
 
@@ -64,7 +70,7 @@ func (am *AutoMode) testUsageDelay() {
 	}
 
 	for n := range checks {
-		checks[n](am.c)
+		go checks[n](am.c)
 		FlushByChannel(am.c)
 	}
 }

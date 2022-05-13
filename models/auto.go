@@ -85,7 +85,7 @@ func (am *AutoMode) StartLoop() {
 	}
 
 	delay := viper.GetInt("nimby.automode.usageCheckInterval")
-	am.si.Start(am.testUsageDelay, delay, false)
+	am.si.Start(am.testUsageDelay, delay, true)
 }
 
 func (am *AutoMode) StopLoop() {

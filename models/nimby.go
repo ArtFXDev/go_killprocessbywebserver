@@ -45,6 +45,7 @@ func (status *NimbyStatus) Merge(otherStatus *NimbyStatus) {
 
 	if otherStatus.Mode != nil {
 		status.SetMode(*otherStatus.Mode)
+		status.TriggerLoop()
 	}
 
 	if otherStatus.Reason != nil {
@@ -70,21 +71,21 @@ func (status *NimbyStatus) SetValue(v bool) {
 }
 
 func (status *NimbyStatus) SetMode(v NimbyStatusMode) {
-	log.Println("[NIMBY] call setMode")
-
 	status.Mode = &[]NimbyStatusMode{v}[0]
 	GetStoreInstance().NimbyStatus.Mode = &[]NimbyStatusMode{v}[0]
-
-	if *(status.Mode) == NIMBY_AUTO {
-		status.AutoMode.StartLoop()
-	} else {
-		status.AutoMode.StopLoop()
-	}
 }
 
 func (status *NimbyStatus) SetReason(v string) {
 	status.Reason = &[]string{v}[0]
 	GetStoreInstance().NimbyStatus.Reason = &[]string{v}[0]
+}
+
+func (status *NimbyStatus) TriggerLoop() {
+	if *(status.Mode) == NIMBY_AUTO {
+		status.AutoMode.StartLoop()
+	} else {
+		status.AutoMode.StopLoop()
+	}
 }
 
 func (status *NimbyStatus) FlushToNimbyProcess() ([]byte, error) {
@@ -120,7 +121,8 @@ func FlushByChannel(nsc chan *NimbyStatus) {
 
 	receive_NimbyStatus.FlushToNimbyProcess()
 	temp_store := GetStoreInstance()
-	temp_store.NimbyStatus.Merge(receive_NimbyStatus)
+
+	UpdateInstance(receive_NimbyStatus)
 
 	log.Printf("Update nimby status from: %t, %s, %s", temp_store.NimbyStatus.GetValue(), temp_store.NimbyStatus.GetMode(), temp_store.NimbyStatus.GetReason())
 	log.Printf("To: %t, %s, %s", receive_NimbyStatus.GetValue(), receive_NimbyStatus.GetMode(), receive_NimbyStatus.GetReason())

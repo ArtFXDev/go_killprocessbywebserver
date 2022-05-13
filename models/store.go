@@ -30,3 +30,17 @@ func GetStoreInstance() *Store {
 	}
 	return storeInstance
 }
+
+func UpdateInstance(ns *NimbyStatus) {
+	if ns.Value != nil {
+		GetStoreInstance().NimbyStatus.SetValue(*ns.Value)
+	}
+
+	if ns.Mode != nil {
+		GetStoreInstance().NimbyStatus.SetMode(*ns.Mode)
+	}
+
+	if ns.Reason != nil {
+		GetStoreInstance().NimbyStatus.SetReason(*ns.Reason)
+	}
+}

@@ -21,9 +21,9 @@ func (server *Server) SetNimbyStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	temp_store := models.GetStoreInstance()
-
 	currentStatus := temp_store.NimbyStatus
 	receiveStatus := models.NewNimbyStatus()
+
 	err = json.Unmarshal(body, &receiveStatus)
 	if err != nil {
 		log.Printf("[NIMBY] Setting Nimby value \n")

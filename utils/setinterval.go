@@ -34,7 +34,6 @@ func (si *SetInterval) Start(someFunc func(), milliseconds int, async bool) chan
 				return
 
 			case <-si.ticker.C:
-
 				si.isRunning = true
 				if async {
 					// This won't block

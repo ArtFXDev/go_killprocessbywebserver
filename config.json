@@ -3,7 +3,7 @@
       "bladeURL": "http://localhost:9005",
       "autoMode": {
         "maxCPUUsage": 50,
-        "usageCheckInterval": 1200,
+        "usageCheckInterval": 5000,
         "switchCheckInterval": 120,
         "startHour": 18,
         "endHour": 8,

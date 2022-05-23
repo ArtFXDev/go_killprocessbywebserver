@@ -68,3 +68,15 @@ func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Ok get processes: %v", rows)
 	responses.JSON(w, http.StatusOK, rows)
 }
+
+func (server *Server) RestartServices(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	process_name := vars["name"]
+	log.Printf("Try to restart process: %v", process_name)
+	err := utils.RestartService(process_name)
+
+	if err != nil {
+		log.Printf("Try to restart process: %v", process_name)
+		responses.JSON(w, http.StatusInternalServerError, "Error when Unmarshal json: ")
+	}
+}

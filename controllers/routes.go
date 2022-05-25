@@ -10,5 +10,5 @@ func (server *Server) initRoutes() {
 	server.Router.HandleFunc("/processes", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareCORS(server.GetProcesses))).Methods("GET")
 
 	// service api
-	server.Router.HandleFunc("/restartservice/{name}", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareCORS(server.RestartServices))).Methods("POST")
+	server.Router.HandleFunc("/restartservice", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareCORS(server.RestartServices))).Methods("POST")
 }

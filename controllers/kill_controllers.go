@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os/exec"
@@ -70,13 +72,22 @@ func (server *Server) GetProcesses(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) RestartServices(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	process_name := vars["name"]
+	b, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error when trying to read request body")
+		responses.JSON(w, http.StatusInternalServerError, "Error when trying to read request body.")
+		return
+	}
+	process_name := string(b)
 	log.Printf("Try to restart process: %v", process_name)
-	err := utils.RestartService(process_name)
+	err = utils.RestartService(process_name)
 
 	if err != nil {
-		log.Printf("Try to restart process: %v", process_name)
-		responses.JSON(w, http.StatusInternalServerError, "Error when Unmarshal json: ")
+		log.Printf("Error when trying to restart process: %v %v", process_name, err)
+		responses.JSON(w, http.StatusInternalServerError, fmt.Sprintf("Error when trying to restart service %v", err))
+		return
 	}
+
+	log.Printf("Restart successfully")
+	responses.JSON(w, http.StatusOK, "Success")
 }

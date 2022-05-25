@@ -5,7 +5,7 @@ import (
 )
 
 func RestartService(serviceName string) error {
-	restartService := exec.Command("Get-Service", "-Name", "net*", "|", "Where-Object", "{$_.Status -eq", serviceName, "}", "|", "Restart-Service")
+	restartService := exec.Command("powershell.exe", "Restart-Service", "-Name", serviceName)
 	err := restartService.Run()
 	if err != nil {
 		return err

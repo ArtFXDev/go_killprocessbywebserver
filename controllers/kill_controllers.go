@@ -91,3 +91,38 @@ func (server *Server) RestartServices(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Restart successfully")
 	responses.JSON(w, http.StatusOK, "Success")
 }
+
+func (server *Server) GetServices(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Received get processes request\n")
+
+	var cmd_powershell = ` Get-Service | Select-Object Name, DisplayName, @{ n='Status'; e={ $_.Status.ToString() } } | ConvertTo-Json`
+
+	get_services := exec.Command("powershell.exe", cmd_powershell)
+	log.Print(get_services)
+
+	stdout, stderr := get_services.CombinedOutput()
+
+	if stderr != nil {
+		responses.JSON(w, http.StatusInternalServerError, "Error when trying to get list of services.")
+		log.Printf("Error when trying to get list of services.")
+		log.Printf("err services: %v ", stderr)
+		log.Printf("log services: %v", string(stdout))
+		return
+	}
+
+	type ServiceRow struct {
+		Name        string
+		DisplayName string
+		Status      string
+	}
+
+	var rows []ServiceRow
+	json.Unmarshal([]byte(stdout), &rows)
+	if stderr != nil {
+		log.Printf("Error when Unmarshal json: %v", stderr)
+		responses.JSON(w, http.StatusInternalServerError, "Error when Unmarshal json: ")
+		return
+	}
+	log.Printf("Ok get service: %v", rows)
+	responses.JSON(w, http.StatusOK, rows)
+}

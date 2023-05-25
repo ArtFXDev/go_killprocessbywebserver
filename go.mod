@@ -1,6 +1,6 @@
 module github.com/OlivierArgentieri/go_killprocess
 
-go 1.17
+go 1.18
 
 require (
 	github.com/gorilla/mux v1.8.0
@@ -17,5 +17,5 @@ require (
 	github.com/getlantern/systray v1.1.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
-	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 )
